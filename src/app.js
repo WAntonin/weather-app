@@ -6,6 +6,7 @@ const geocode = require('./utils/geocode')
 const forecast = require('./utils/forecast')
 
 const app = express()
+exports.app = app
 const port = process.env.PORT || 3000
 
 // Define path for express config
@@ -20,66 +21,6 @@ app.set('views', viewPath)
 hbs.registerPartials(partialsPath)
 
 app.use(express.static(publicDirectoryPath))
-
-app.get('', (req, res) => {
-    res.render('index', {
-        title: 'Weather-app',
-        name: 'Antonin Welvart'
-    })
-})
-
-app.get('/about', (req, res) => {
-    res.render('about', {
-        title: 'About',
-        name: 'Antonin Welvart'
-    })
-})
-
-app.get('/help', (req, res) => {
-    res.render('help', {
-        title: 'Help',
-        name: 'Antonin Welvart'
-    })
-})
-
-app.get('/weather', (req, res) => {
-    if (!req.query.address) {
-        return res.send({
-            error: 'Vous devez fournir une loacalisation'
-        })
-    }
-    geocode(req.query.address, (error, { latitude, longitude, location } = {}) => {
-        if (error) {
-            return res.send({ error })
-        }
-
-        forecast(latitude, longitude, (error, forecastData) => {
-            if (error) {
-                return res.send({ error })
-            }
-            res.send({
-                forecast: forecastData,
-                location,
-                adress: req.query.address
-            })
-        })
-    })
-})
-
-app.get('/help/*', (req, res) => {
-    res.render('404', {
-        title: '404',
-        name: 'Antonin Welvart',
-        errorMessage: 'Help content not found'
-    })
-})
-app.get('*', (req, res) => {
-    res.render('404', {
-        title: '404',
-        name: 'Antonin Welvart',
-        errorMessage: 'Page not found'
-    })
-})
 
 app.listen(port, () => {
     console.log('Server is up on port ' + port)
